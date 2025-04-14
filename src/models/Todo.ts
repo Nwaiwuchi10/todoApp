@@ -13,6 +13,8 @@ export interface ITodo extends Document {
   link?: string;
   comment?: string;
   date: Date;
+  startDate: Date;
+  endDate: Date;
   slug: string;
 }
 
@@ -27,6 +29,8 @@ const TodoSchema = new Schema<ITodo>(
     link: { type: String },
     comment: { type: String },
     date: { type: Date, default: Date.now },
+    startDate: { type: Date },
+    endDate: { type: Date },
     slug: { type: String, unique: true },
   },
   { timestamps: true }

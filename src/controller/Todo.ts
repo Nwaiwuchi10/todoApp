@@ -15,7 +15,7 @@ export const createTodo = async (req: Request, res: Response) => {
 // Get all todos
 export const getAllTodos = async (_: Request, res: Response) => {
   try {
-    const todos = await Todo.find();
+    const todos = await Todo.find().sort({ createdAt: -1 });
     res.json(todos);
   } catch (error) {
     res.status(500).json({ error: error.message });

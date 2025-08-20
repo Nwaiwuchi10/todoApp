@@ -110,7 +110,27 @@ export const updateComment = async (req: any, res: any) => {
     res.status(400).json({ error: error.message });
   }
 };
-export const getTodoWithComments = async (req: Request, res: Response) => {
+export const addCommentToTodo = async (req: any, res: any): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+
+    const todo = await Todo.findById(id);
+    if (!todo) return res.status(404).json({ message: "Project not found" });
+
+    todo.comments.push({ text, date: new Date() });
+    await todo.save();
+
+    res.status(201).json({ message: "Comment added", comments: todo.comments });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTodoWithComments = async (
+  req: any,
+  res: any
+): Promise<void> => {
   try {
     const { id } = req.params;
     const todo = await Todo.findById(id);
@@ -128,7 +148,10 @@ export const getTodoWithComments = async (req: Request, res: Response) => {
   }
 };
 
-export const getTodosByDueDate = async (req: Request, res: Response) => {
+export const getTodosByDueDate = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { from, to } = req.query;
 

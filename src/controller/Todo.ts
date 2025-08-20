@@ -11,7 +11,15 @@ export const createTodo = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
-
+export const createTodos = async (req: Request, res: Response) => {
+  try {
+    const todo = new Todo(req.body);
+    const savedTodo = await todo.save();
+    res.status(201).json(savedTodo);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
 // Get all todos
 export const getAllTodos = async (_: Request, res: Response) => {
   try {
@@ -100,5 +108,40 @@ export const updateComment = async (req: any, res: any) => {
     res.json(todo);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+export const getTodoWithComments = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const todo = await Todo.findById(id);
+
+    if (!todo) return res.status(404).json({ message: "Project not found" });
+
+    // sort comments by date (latest first)
+    const sortedComments = todo.comments.sort(
+      (a, b) => b.date.getTime() - a.date.getTime()
+    );
+
+    res.json({ ...todo.toObject(), comments: sortedComments });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTodosByDueDate = async (req: Request, res: Response) => {
+  try {
+    const { from, to } = req.query;
+
+    const filter: any = {};
+    if (from || to) {
+      filter.endDate = {};
+      if (from) filter.endDate.$gte = new Date(from as string);
+      if (to) filter.endDate.$lte = new Date(to as string);
+    }
+
+    const todos = await Todo.find(filter).sort({ endDate: 1 }); // earliest due first
+    res.json(todos);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };

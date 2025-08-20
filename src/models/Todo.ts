@@ -6,17 +6,29 @@ export enum TodoStatus {
   IN_PROGRESS = "in-progress",
   COMPLETED = "completed",
 }
+export interface IComment {
+  text: string;
+  date: Date;
+}
 
 export interface ITodo extends Document {
   projectName: string;
   status: TodoStatus;
   link?: string;
   comment?: string;
+  stageUrl?: string;
+  desc?: string;
   date: Date;
   startDate: Date;
   endDate: Date;
   slug: string;
+  developers: string[];
+  comments: IComment[];
 }
+const CommentSchema = new Schema<IComment>({
+  text: { type: String, required: true },
+  date: { type: Date, default: Date.now },
+});
 
 const TodoSchema = new Schema<ITodo>(
   {
@@ -26,12 +38,16 @@ const TodoSchema = new Schema<ITodo>(
       enum: Object.values(TodoStatus),
       default: TodoStatus.PENDING,
     },
+    stageUrl: { type: String },
     link: { type: String },
     comment: { type: String },
+    desc: { type: String },
     date: { type: Date, default: Date.now },
     startDate: { type: Date },
     endDate: { type: Date },
     slug: { type: String, unique: true },
+    developers: [{ type: String }],
+    comments: [CommentSchema],
   },
   { timestamps: true }
 );
